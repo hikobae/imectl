@@ -10,8 +10,10 @@ const TRUE: isize = 1;
 const FALSE: isize = 0;
 
 pub fn get_focus_window() -> Result<HWND> {
-    let mut gui_info = GUITHREADINFO::default();
-    gui_info.cbSize = std::mem::size_of::<GUITHREADINFO>() as u32;
+    let mut gui_info = GUITHREADINFO {
+        cbSize: std::mem::size_of::<GUITHREADINFO>() as u32,
+        ..Default::default()
+    };
 
     unsafe {
         GetGUIThreadInfo(0, &mut gui_info)?;
