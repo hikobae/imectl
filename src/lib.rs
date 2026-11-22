@@ -3,11 +3,11 @@ use windows::Win32::UI::Input::Ime::{IMC_SETOPENSTATUS, ImmGetDefaultIMEWnd};
 use windows::Win32::UI::WindowsAndMessaging::{
     GUITHREADINFO, GetGUIThreadInfo, SMTO_ABORTIFHUNG, SendMessageTimeoutW, WM_IME_CONTROL,
 };
-use windows::core::{Error, Result};
+use windows::core::Error;
 
 const TIMEOUT_MS: u32 = 500;
 
-pub fn get_focus_window() -> Result<HWND> {
+pub fn get_focus_window() -> windows::core::Result<HWND> {
     let mut gui_info = GUITHREADINFO {
         cbSize: std::mem::size_of::<GUITHREADINFO>() as u32,
         ..Default::default()
@@ -29,7 +29,7 @@ pub fn get_focus_window() -> Result<HWND> {
     Ok(hwnd)
 }
 
-pub fn get_default_ime_wnd(focus_hwnd: HWND) -> Result<HWND> {
+pub fn get_default_ime_wnd(focus_hwnd: HWND) -> windows::core::Result<HWND> {
     let hwnd = unsafe { ImmGetDefaultIMEWnd(focus_hwnd) };
     if hwnd.is_invalid() {
         return Err(Error::new(
@@ -47,7 +47,7 @@ pub fn get_default_ime_wnd(focus_hwnd: HWND) -> Result<HWND> {
 /// - タイムアウトした、または相手が無応答だった
 /// - 相手が管理者権限で動作しており、権限の低いこのプロセスからの送信が
 ///   UIPI (User Interface Privilege Isolation) により拒否された
-pub fn set_ime_open_status(hwnd: HWND, open: bool) -> Result<()> {
+pub fn set_ime_open_status(hwnd: HWND, open: bool) -> windows::core::Result<()> {
     let result = unsafe {
         SendMessageTimeoutW(
             hwnd,
@@ -68,10 +68,13 @@ pub fn set_ime_open_status(hwnd: HWND, open: bool) -> Result<()> {
     Ok(())
 }
 
-pub fn parse_args(args: &[String]) -> bool {
-    if args.len() < 2 {
-        return false;
+pub fn parse_args(args: &[String]) -> Result<bool, String> {
+    match args {
+        [] | [_] => Ok(false),
+        [_, value] => value
+            .parse::<i64>()
+            .map(|n| n != 0)
+            .map_err(|_| format!("invalid argument: {value}")),
+        _ => Err("too many arguments".to_string()),
     }
-
-    args[1].parse::<i32>().unwrap_or(0) != 0
 }
