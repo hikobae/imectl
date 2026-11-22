@@ -19,7 +19,7 @@ pub fn main() -> WinResult<()> {
 
     let args: Vec<String> = std::env::args().collect();
     let open = imectl::parse_args(&args);
-    imectl::set_ime_open_status(ime_hwnd, open);
+    imectl::set_ime_open_status(ime_hwnd, open)?;
 
     Ok(())
 }

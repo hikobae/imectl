@@ -1,11 +1,11 @@
 use windows::Win32::Foundation::{E_FAIL, HWND, LPARAM, WPARAM};
-use windows::Win32::UI::Input::Ime::ImmGetDefaultIMEWnd;
+use windows::Win32::UI::Input::Ime::{IMC_SETOPENSTATUS, ImmGetDefaultIMEWnd};
 use windows::Win32::UI::WindowsAndMessaging::{
-    GUITHREADINFO, GetGUIThreadInfo, SendMessageW, WM_IME_CONTROL,
+    GUITHREADINFO, GetGUIThreadInfo, SMTO_ABORTIFHUNG, SendMessageTimeoutW, WM_IME_CONTROL,
 };
 use windows::core::{Error, Result};
 
-const IMC_SETOPENSTATUS: usize = 0x06;
+const TIMEOUT_MS: u32 = 500;
 
 pub fn get_focus_window() -> Result<HWND> {
     let mut gui_info = GUITHREADINFO {
@@ -40,15 +40,32 @@ pub fn get_default_ime_wnd(focus_hwnd: HWND) -> Result<HWND> {
     Ok(hwnd)
 }
 
-pub fn set_ime_open_status(hwnd: HWND, open: bool) {
-    unsafe {
-        SendMessageW(
+/// IME の ON/OFF 状態を設定するメッセージを送信する。
+///
+/// 相手のウィンドウが応答しない場合に固まらないよう、タイムアウト付きで送信する。
+/// 次の場合は `Err` を返す。
+/// - タイムアウトした、または相手が無応答だった
+/// - 相手が管理者権限で動作しており、権限の低いこのプロセスからの送信が
+///   UIPI (User Interface Privilege Isolation) により拒否された
+pub fn set_ime_open_status(hwnd: HWND, open: bool) -> Result<()> {
+    let result = unsafe {
+        SendMessageTimeoutW(
             hwnd,
             WM_IME_CONTROL,
-            Some(WPARAM(IMC_SETOPENSTATUS)),
-            Some(LPARAM(open as isize)),
-        );
+            WPARAM(IMC_SETOPENSTATUS as usize),
+            LPARAM(open as isize),
+            SMTO_ABORTIFHUNG,
+            TIMEOUT_MS,
+            None,
+        )
+    };
+    if result.0 == 0 {
+        return Err(Error::new(
+            E_FAIL,
+            "Failed to send IME message (timeout or access denied).",
+        ));
     }
+    Ok(())
 }
 
 pub fn parse_args(args: &[String]) -> bool {
