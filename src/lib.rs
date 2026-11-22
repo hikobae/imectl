@@ -6,8 +6,6 @@ use windows::Win32::UI::WindowsAndMessaging::{
 use windows::core::Result;
 
 const IMC_SETOPENSTATUS: usize = 0x06;
-const TRUE: isize = 1;
-const FALSE: isize = 0;
 
 pub fn get_focus_window() -> Result<HWND> {
     let mut gui_info = GUITHREADINFO {
@@ -31,7 +29,7 @@ pub fn set_ime_open_status(hwnd: HWND, open: bool) {
             hwnd,
             WM_IME_CONTROL,
             Some(WPARAM(IMC_SETOPENSTATUS)),
-            Some(LPARAM(if open { TRUE } else { FALSE })),
+            Some(LPARAM(open as isize)),
         );
     }
 }
