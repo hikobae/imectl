@@ -3,6 +3,8 @@
         "GUITHREADINFO",
         "HRESULT",
         "SETOPENSTATUS",
+        "SMTO_ABORTIFHUNG",
+        "UIPI",
         "imectl"
     ]
 }
