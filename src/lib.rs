@@ -1,9 +1,9 @@
-use windows::Win32::Foundation::{HWND, LPARAM, WPARAM};
+use windows::Win32::Foundation::{E_FAIL, HWND, LPARAM, WPARAM};
 use windows::Win32::UI::Input::Ime::ImmGetDefaultIMEWnd;
 use windows::Win32::UI::WindowsAndMessaging::{
     GUITHREADINFO, GetGUIThreadInfo, SendMessageW, WM_IME_CONTROL,
 };
-use windows::core::Result;
+use windows::core::{Error, Result};
 
 const IMC_SETOPENSTATUS: usize = 0x06;
 
@@ -15,8 +15,18 @@ pub fn get_focus_window() -> Result<HWND> {
 
     unsafe {
         GetGUIThreadInfo(0, &mut gui_info)?;
-        Ok(gui_info.hwndFocus)
     }
+
+    // フォーカスなし時, hwndActive にフォールバックする
+    let hwnd = if gui_info.hwndFocus.is_invalid() {
+        gui_info.hwndActive
+    } else {
+        gui_info.hwndFocus
+    };
+    if hwnd.is_invalid() {
+        return Err(Error::new(E_FAIL, "Failed to obtain focus window handle."));
+    }
+    Ok(hwnd)
 }
 
 pub fn get_default_ime_wnd(focus_hwnd: HWND) -> HWND {
