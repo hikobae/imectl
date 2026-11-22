@@ -29,8 +29,15 @@ pub fn get_focus_window() -> Result<HWND> {
     Ok(hwnd)
 }
 
-pub fn get_default_ime_wnd(focus_hwnd: HWND) -> HWND {
-    unsafe { ImmGetDefaultIMEWnd(focus_hwnd) }
+pub fn get_default_ime_wnd(focus_hwnd: HWND) -> Result<HWND> {
+    let hwnd = unsafe { ImmGetDefaultIMEWnd(focus_hwnd) };
+    if hwnd.is_invalid() {
+        return Err(Error::new(
+            E_FAIL,
+            "Failed to obtain default IME window handle.",
+        ));
+    }
+    Ok(hwnd)
 }
 
 pub fn set_ime_open_status(hwnd: HWND, open: bool) {

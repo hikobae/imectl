@@ -9,7 +9,7 @@ pub fn main() -> WinResult<()> {
         ));
     }
 
-    let ime_hwnd = imectl::get_default_ime_wnd(focus_hwnd);
+    let ime_hwnd = imectl::get_default_ime_wnd(focus_hwnd)?;
     if ime_hwnd.0 == std::ptr::null_mut() {
         return Err(WinError::new(
             windows::core::HRESULT(0),
