@@ -10,7 +10,7 @@ cargo build --release
 
 ## 実行
 
-引数は 0（OFF）/　1（ON）。例:
+引数は 0（OFF）/ 1（ON）。例:
 
 ```powershell
 # IME を off にする
