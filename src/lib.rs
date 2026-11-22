@@ -30,8 +30,8 @@ pub fn set_ime_open_status(hwnd: HWND, open: bool) {
         SendMessageW(
             hwnd,
             WM_IME_CONTROL,
-            WPARAM(IMC_SETOPENSTATUS),
-            LPARAM(if open { TRUE } else { FALSE }),
+            Some(WPARAM(IMC_SETOPENSTATUS)),
+            Some(LPARAM(if open { TRUE } else { FALSE })),
         );
     }
 }

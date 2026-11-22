@@ -2,7 +2,7 @@ use windows::core::{Error as WinError, Result as WinResult};
 
 pub fn main() -> WinResult<()> {
     let focus_hwnd = imectl::get_focus_window()?;
-    if focus_hwnd.0 == 0 {
+    if focus_hwnd.0 == std::ptr::null_mut() {
         return Err(WinError::new(
             windows::core::HRESULT(0),
             "Failed to obtain focus window handle.",
@@ -10,7 +10,7 @@ pub fn main() -> WinResult<()> {
     }
 
     let ime_hwnd = imectl::get_default_ime_wnd(focus_hwnd);
-    if ime_hwnd.0 == 0 {
+    if ime_hwnd.0 == std::ptr::null_mut() {
         return Err(WinError::new(
             windows::core::HRESULT(0),
             "Failed to obtain IME window handle.",
