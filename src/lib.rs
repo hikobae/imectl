@@ -71,10 +71,11 @@ pub fn set_ime_open_status(hwnd: HWND, open: bool) -> windows::core::Result<()> 
 pub fn parse_args(args: &[String]) -> Result<bool, String> {
     match args {
         [] | [_] => Ok(false),
-        [_, value] => value
-            .parse::<i64>()
-            .map(|n| n != 0)
-            .map_err(|_| format!("invalid argument: {value}")),
+        [_, value] => match value.as_str() {
+            "0" => Ok(false),
+            "1" => Ok(true),
+            _ => Err(format!("invalid argument: {value}")),
+        },
         _ => Err("too many arguments".to_string()),
     }
 }

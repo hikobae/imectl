@@ -28,6 +28,9 @@ fn zero_is_false() {
 
 #[test]
 fn invalid_is_error() {
+    assert!(parse_args(args!["imectl", "-1"]).is_err());
+    assert!(parse_args(args!["imectl", "2"]).is_err());
+    assert!(parse_args(args!["imectl", "99999999999"]).is_err());
     assert!(parse_args(args!["imectl", "invalid"]).is_err());
     assert!(parse_args(args!["imectl", ""]).is_err());
     assert!(parse_args(args!["imectl", "99999999999999999999"]).is_err());
