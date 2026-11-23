@@ -1,6 +1,6 @@
 [package]
 name = "imectl"
-version = "0.1.0"
+version = "0.2.0"
 description = "Toggle the Windows IME from the CLI"
 authors = ["TAKAHASHI Satoshi <hikobae@gmail.com>"]
 edition = "2024"
