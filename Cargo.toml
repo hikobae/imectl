@@ -1,8 +1,20 @@
 [package]
 name = "imectl"
 version = "0.1.0"
+description = "Toggle the Windows IME from the CLI"
+authors = ["TAKAHASHI Satoshi <hikobae@gmail.com>"]
 edition = "2024"
 rust-version = "1.85"
+repository = "https://github.com/hikobae/imectl"
+license = "MIT"
+readme = "README.md"
+publish = false
+
+[package.metadata.winresource]
+LegalCopyright = "(C) TAKAHASHI Satoshi 2026"
 
 [dependencies]
 windows = { version = "0.62", features = ["Win32_Foundation", "Win32_UI_Input_Ime", "Win32_UI_WindowsAndMessaging"] }
+
+[build-dependencies]
+winresource = "0.1.34"
