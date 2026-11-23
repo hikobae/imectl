@@ -7,26 +7,33 @@ macro_rules! args {
 }
 
 #[test]
-fn parse_args_defaults_to_false_when_no_argument() {
+fn defaults_to_false_when_no_argument() {
     assert_eq!(parse_args(args!["imectl"]), Ok(false));
 }
 
 #[test]
-fn parse_args_returns_true_for_nonzero_argument() {
+fn empty_args_is_false() {
+    assert_eq!(parse_args(&[]), Ok(false));
+}
+
+#[test]
+fn one_is_true() {
     assert_eq!(parse_args(args!["imectl", "1"]), Ok(true));
 }
 
 #[test]
-fn parse_args_returns_false_for_zero_argument() {
+fn zero_is_false() {
     assert_eq!(parse_args(args!["imectl", "0"]), Ok(false));
 }
 
 #[test]
-fn parse_args_returns_error_for_invalid_argument() {
+fn invalid_is_error() {
     assert!(parse_args(args!["imectl", "invalid"]).is_err());
+    assert!(parse_args(args!["imectl", ""]).is_err());
+    assert!(parse_args(args!["imectl", "99999999999999999999"]).is_err());
 }
 
 #[test]
-fn parse_args_too_many_arguments() {
-    assert!(parse_args(args!["imectl", "1", "extra"]).is_err());
+fn extra_args_is_error() {
+    assert!(parse_args(args!["imectl", "1", "0"]).is_err());
 }
